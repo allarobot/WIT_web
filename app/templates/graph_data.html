@@ -13,6 +13,11 @@
 <input type="submit" value="清除数据">
 </form>
 
+</form>
+
+<form id="test1" action={{ url_for('test1') }} method="post">
+<input type="submit" value="High关系">
+</form>
 
 {% for message in get_flashed_messages() %}
 <div class="flash">{{ message }}</div>

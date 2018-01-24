@@ -50,6 +50,12 @@ def clear():
     flash("database been cleared")
     return render_template("graph_data.html")
 
+@app.route("/test1",methods=['POST'])
+def test1():
+    data =db.test1()
+    flash("get high status relationship")
+    return render_template("graph_data.html")
+
 @app.route("/piebar")
 def piebar():
     data = db.stats()
@@ -105,3 +111,4 @@ def upload():
         jsw = Jsw(res)
         print(jsw.info_auto)
     return render_template('graph_data.html',res=res)
+

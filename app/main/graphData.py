@@ -238,3 +238,44 @@ class Neo4j(object):
             data = [{'NUMBER':0, 'STATUS':'NULL', 'CONNECTOR':None}]
 
         return data
+
+
+    def test1(self):
+        query = '''
+        match (n1:pin)
+        return n1.connectorName as ConnectorName, count(n1.connectorName) as PinNumber
+        order by n1.connectorName'''
+        data1 = Neo4j._graph.run(query).data()
+        query = '''
+        match (n1:pin)-[:continuity]-()
+        return n1.connectorName as ConnectorName,count(n1.connectorName) as TestingTimes
+        order by n1.connectorName'''
+        data2 = Neo4j._graph.run(query).data()
+        query = '''
+        match  (n1:pin)-[rel:continuity{status:'HIGH'}]-(n2:pin)
+        return n1.connectorName as ConnectorName1,n2.connectorName as ConnectorName2,count(rel) as HighTimes
+        order by n1.connectorName'''
+        data3 = Neo4j._graph.run(query).data()
+        Connector={}
+        for info in data1:
+            Name = info[u'ConnectorName']
+            Connector[Name]={u'PinNumber':info[u'PinNumber']}
+        for info in data2:
+            Name = info[u'ConnectorName']
+            Connector[Name][u'TestingTimes']= info[u'TestingTimes']
+
+        for info in data3:
+            cnt1,cnt2,high_num =info[u'ConnectorName1'],info[u'ConnectorName2'],info[u'HighTimes']
+            pin_number1, test_times1 = Connector[cnt1][u'PinNumber'],Connector[cnt1][u'TestingTimes']
+            pin_number2, test_times2 = Connector[cnt2][u'PinNumber'], Connector[cnt2][u'TestingTimes']
+            info[u'PinNumber1'],info[u'TestingTimes1'] = Connector[cnt1][u'PinNumber'],Connector[cnt1][u'TestingTimes']
+            info[u'PinNumber2'],info[u'TestingTimes2'] = Connector[cnt2][u'PinNumber'], Connector[cnt2][u'TestingTimes']
+            outtext = "%20s%20s%20s%20s%20s%20s%20s\n"%(cnt1,pin_number1,test_times1,cnt2,pin_number2,test_times2,high_num)
+            print(outtext)
+        pd_data = pd.DataFrame(data3)
+        with pd.ExcelWriter("High_RelationShip.xlsx") as writer:
+            pd_data.to_excel(writer, index=False)
+        # print(Connector)
+        # print(data1)
+        # print(data2)
+        print(data3)
