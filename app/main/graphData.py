@@ -275,7 +275,5 @@ class Neo4j(object):
         pd_data = pd.DataFrame(data3)
         with pd.ExcelWriter("High_RelationShip.xlsx") as writer:
             pd_data.to_excel(writer, index=False)
-        # print(Connector)
-        # print(data1)
-        # print(data2)
+
         print(data3)
